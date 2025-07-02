@@ -1,4 +1,4 @@
-from pipeline_difix import DifixPipeline
+from src.pipeline_difix import DifixPipeline
 from diffusers.utils import load_image
 
 pipe = DifixPipeline.from_pretrained("nvidia/difix", trust_remote_code=True)
