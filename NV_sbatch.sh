@@ -13,6 +13,5 @@ submit_job --gpu 1 --cpu 16 --nodes 1 --partition=grizzly,polar,polar3,polar4 --
                 --name $job_name \
                 --logdir $base_logdir \
                 --notimestamp \
-                --exclusive \
                 --command  "bash /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/code/Difix3D/NV_run.sh"
 
