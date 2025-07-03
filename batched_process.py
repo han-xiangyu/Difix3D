@@ -32,7 +32,8 @@ def batch_process(
     ref_path = Path(ref_path)
     if not ref_path.exists():
         print(f"Reference image not found for {img_path.name}, skipping.")
-
+    ref_img = load_image(str(ref_path))
+    
     # Iterate over files in input_folder
     for img_path in Path(input_folder).iterdir():
         if img_path.suffix.lower() not in extensions:
@@ -46,13 +47,13 @@ def batch_process(
         try:
             # Load input and reference images
             img = load_image(str(img_path))
-            ref_img = load_image(str(ref_path))
+            
 
             # Run the pipeline with reference image
             result = pipe(
                 prompt,
                 image=img,
-                ref_image=ref_img,
+                # ref_image=ref_img,
                 num_inference_steps=num_inference_steps,
                 timesteps=timesteps,
                 guidance_scale=guidance_scale
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     # Example usage
     INPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_per_8M_pts/train/ours_99993/renders"
     REF_PATH = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_per_8M_pts/train/ours_99993/gt/trav_2_channel_1_img_1000.jpg"
-    OUTPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_per_8M_pts/train/ours_99993/renders_difix_w_ref"
+    OUTPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_per_8M_pts/train/ours_99993/renders_difix_wo_ref"
     PROMPT = "remove degradation"
 
     batch_process(
