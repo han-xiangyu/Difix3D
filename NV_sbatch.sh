@@ -1,6 +1,6 @@
 
 job_name="3DfoundationModelDifix3D"
-base_logdir="/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/logs/Difix3D_spatial05_frames6000_with_multi_frame_depth_9Mpts_Iter200k"
+base_logdir="/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/logs/Difix3D_spatial05_frames6000_with_multi_frame_depth"
 
 
 # Train
