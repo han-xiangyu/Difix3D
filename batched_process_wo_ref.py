@@ -58,8 +58,8 @@ def batch_process(
 
 if __name__ == "__main__":
     # Example usage
-    INPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_per_8M_pts/train/ours_99993/renders"
-    OUTPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_per_8M_pts/train/ours_99993/renders_difix_wo_ref"
+    INPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_with_multi_frame_depth_9Mpts_Iter200k/train/ours_99993/renders"
+    OUTPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames6000_with_multi_frame_depth_9Mpts_Iter200k/train/ours_99993/renders_difix_wo_ref"
     PROMPT = "remove degradation"
 
     batch_process(
