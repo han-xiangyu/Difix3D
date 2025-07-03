@@ -35,30 +35,36 @@ def batch_process(
 
     # Iterate over files in input_folder
     for img_path in Path(input_folder).iterdir():
-        if img_path.suffix.lower() in extensions:
+        if img_path.suffix.lower() not in extensions:
+            continue
 
-            try:
-                # Load input and reference images
-                img = load_image(str(img_path))
-                ref_img = load_image(str(ref_path))
+        # Prepare output path and skip if already processed
+        output_path = Path(output_folder) / img_path.name
+        if output_path.exists():
+            print(f"Skipping {img_path.name}: output already exists.")
+            continue
+        try:
+            # Load input and reference images
+            img = load_image(str(img_path))
+            ref_img = load_image(str(ref_path))
 
-                # Run the pipeline with reference image
-                result = pipe(
-                    prompt,
-                    image=img,
-                    ref_image=ref_img,
-                    num_inference_steps=num_inference_steps,
-                    timesteps=timesteps,
-                    guidance_scale=guidance_scale
-                )
+            # Run the pipeline with reference image
+            result = pipe(
+                prompt,
+                image=img,
+                ref_image=ref_img,
+                num_inference_steps=num_inference_steps,
+                timesteps=timesteps,
+                guidance_scale=guidance_scale
+            )
 
-                # Save output image
-                output_path = Path(output_folder) / img_path.name
-                result.images[0].save(str(output_path))
-                print(f"Processed and saved: {output_path}")
+            # Save output image
+            output_path = Path(output_folder) / img_path.name
+            result.images[0].save(str(output_path))
+            print(f"Processed and saved: {output_path}")
 
-            except Exception as e:
-                print(f"Failed to process {img_path.name}: {e}")
+        except Exception as e:
+            print(f"Failed to process {img_path.name}: {e}")
 
 if __name__ == "__main__":
     # Example usage
