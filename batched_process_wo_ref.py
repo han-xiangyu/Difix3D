@@ -27,27 +27,34 @@ def batch_process(
 
     # Iterate over files in input_folder
     for img_path in Path(input_folder).iterdir():
-        if img_path.suffix.lower() in extensions:
-            try:
-                # Load input image
-                img = load_image(str(img_path))
+        if img_path.suffix.lower() not in extensions:
+            continue
 
-                # Run the pipeline
-                result = pipe(
-                    prompt,
-                    image=img,
-                    num_inference_steps=num_inference_steps,
-                    timesteps=timesteps,
-                    guidance_scale=guidance_scale
-                )
+        # Prepare output path and skip if already processed
+        output_path = Path(output_folder) / img_path.name
+        if output_path.exists():
+            print(f"Skipping {img_path.name}: output already exists.")
+            continue
+        try:
+            # Load input image
+            img = load_image(str(img_path))
 
-                # Save output image
-                output_path = Path(output_folder) / img_path.name
-                result.images[0].save(str(output_path))
-                print(f"Processed and saved: {output_path}")
+            # Run the pipeline
+            result = pipe(
+                prompt,
+                image=img,
+                num_inference_steps=num_inference_steps,
+                timesteps=timesteps,
+                guidance_scale=guidance_scale
+            )
 
-            except Exception as e:
-                print(f"Failed to process {img_path.name}: {e}")
+            # Save output image
+            output_path = Path(output_folder) / img_path.name
+            result.images[0].save(str(output_path))
+            print(f"Processed and saved: {output_path}")
+
+        except Exception as e:
+            print(f"Failed to process {img_path.name}: {e}")
 
 if __name__ == "__main__":
     # Example usage
