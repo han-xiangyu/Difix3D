@@ -244,9 +244,12 @@ def generate_video_from_folders(base_paths, output_video_path, baseline_labels, 
     print(f"视频已保存到 {output_video_path}")
 
 def extract_basename_key(filename):
-    """Extract key like 'trav_001_channel_001_img_0001' from filename"""
-    return re.sub(r'(_[^_]+)?\.(jpg|jpeg|png)$', '', filename.lower())
-
+    """
+    Removes known suffix (e.g., _difix3d) from filename before extension
+    """
+    name = Path(filename).stem  # e.g., "trav_001_channel_001_img_0001_difix3d"
+    name = re.sub(r'_difix3d$', '', name)  # Remove known suffix
+    return name.lower()
 
 
 if __name__ == "__main__":
