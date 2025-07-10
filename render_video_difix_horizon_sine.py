@@ -245,12 +245,19 @@ def generate_video_from_folders(base_paths, output_video_path, baseline_labels, 
 
 def extract_basename_key(filename):
     """
-    Removes known suffix (e.g., _difix3d) from filename before extension
+    Normalize filename by removing known suffixes and zero-padding indices to 3 digits
+    e.g., 'trav_2_channel_2_img_43_difix3d.jpg' → 'trav_2_channel_2_img_043'
     """
-    name = Path(filename).stem  # e.g., "trav_001_channel_001_img_0001_difix3d"
-    name = re.sub(r'_difix3d$', '', name)  # Remove known suffix
-    return name.lower()
+    name = Path(filename).stem  # Remove .jpg/.png
+    name = re.sub(r'_difix3d$', '', name)  # Remove suffix
 
+    # Normalize the frame_id part to be zero-padded (3 digits)
+    m = re.match(r'(trav_\d+_channel_\d+_img_)(\d+)', name)
+    if m:
+        prefix = m.group(1)
+        frame_id = int(m.group(2))
+        return f"{prefix}{frame_id:03d}".lower()
+    return name.lower()
 
 if __name__ == "__main__":
     # model_folder = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/models/long_video_frames6000_full_autoresume_distributed8GPU/"
