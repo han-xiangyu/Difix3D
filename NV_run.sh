@@ -13,7 +13,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:/usr/lib/x86_64-linux-gnu
 
 cd /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/code/Difix3D
 
-python batched_process_wo_ref.py
+python batched_process_w_ref.py
 
 # python render_video_difix_horizon_sine.py /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/ --fps 15
 
