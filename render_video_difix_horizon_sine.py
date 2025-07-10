@@ -137,13 +137,21 @@ def calculate_valid_frame_indices(gt_folder_path):
 
 def read_and_concatenate_images(base_paths, valid_frames, baseline_labels, target_size, valid_global_indices):
     all_concatenated_images = []
-    all_image_lists = []
+    # all_image_lists = []
 
-    # 为每个baseline文件夹获取已排序的图片列表
+    # # 为每个baseline文件夹获取已排序的图片列表
+    # for base_path in base_paths:
+    #     image_files = [f for f in os.listdir(base_path) if f.lower().endswith(('.jpg', '.png'))]
+    #     image_files.sort()
+    #     all_image_lists.append(image_files)
+
+
+    # For each folder, map basename keys to full paths
+    all_image_maps = []
     for base_path in base_paths:
         image_files = [f for f in os.listdir(base_path) if f.lower().endswith(('.jpg', '.png'))]
-        image_files.sort()
-        all_image_lists.append(image_files)
+        image_map = {extract_basename_key(f): os.path.join(base_path, f) for f in image_files}
+        all_image_maps.append(image_map)
 
     total_frames = len(valid_frames)
     print(f"[DEBUG] Total valid frames from GT: {total_frames}")
@@ -157,16 +165,31 @@ def read_and_concatenate_images(base_paths, valid_frames, baseline_labels, targe
         left_idx = valid_global_indices[3*i + 1]
         right_idx = valid_global_indices[3*i + 2]
 
-        for idx, (base_path, baseline_label, image_files) in enumerate(zip(base_paths, baseline_labels, all_image_lists)):
-            # 检查索引范围
-            if (front_idx >= len(image_files) or left_idx >= len(image_files) or right_idx >= len(image_files)):
-                print(f"[WARNING] {base_path} 中图片数量不足，无法获取第 {i} 帧的front/left/right图片，跳过该帧。")
+        for idx, (base_path, baseline_label) in enumerate(zip(base_paths, baseline_labels)):
+            # # 检查索引范围
+            # if (front_idx >= len(image_files) or left_idx >= len(image_files) or right_idx >= len(image_files)):
+            #     print(f"[WARNING] {base_path} 中图片数量不足，无法获取第 {i} 帧的front/left/right图片，跳过该帧。")
+            #     skip_frame = True
+            #     break
+
+            # front_img_path = os.path.join(base_path, image_files[front_idx])
+            # left_img_path = os.path.join(base_path, image_files[left_idx])
+            # right_img_path = os.path.join(base_path, image_files[right_idx])
+
+            front_key = extract_basename_key(valid_frames[i]['front'].split("/")[-1])
+            left_key  = extract_basename_key(valid_frames[i]['left'].split("/")[-1])
+            right_key = extract_basename_key(valid_frames[i]['right'].split("/")[-1])
+
+
+            front_img_path = image_map.get(front_key)
+            left_img_path  = image_map.get(left_key)
+            right_img_path = image_map.get(right_key)
+
+
+            if not front_img_path or not left_img_path or not right_img_path:
+                print(f"[WARNING] Missing image for frame {i}: {front_key}, {left_key}, {right_key}")
                 skip_frame = True
                 break
-
-            front_img_path = os.path.join(base_path, image_files[front_idx])
-            left_img_path = os.path.join(base_path, image_files[left_idx])
-            right_img_path = os.path.join(base_path, image_files[right_idx])
 
             front_img = cv2.imread(front_img_path)
             left_img = cv2.imread(left_img_path)
@@ -220,6 +243,12 @@ def generate_video_from_folders(base_paths, output_video_path, baseline_labels, 
     video_writer.release()
     print(f"视频已保存到 {output_video_path}")
 
+def extract_basename_key(filename):
+    """Extract key like 'trav_001_channel_001_img_0001' from filename"""
+    return re.sub(r'(_[^_]+)?\.(jpg|jpeg|png)$', '', filename.lower())
+
+
+
 if __name__ == "__main__":
     # model_folder = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/models/long_video_frames6000_full_autoresume_distributed8GPU/"
     # baseline_labels = ["Ground truth", "GrendelGS"]
@@ -271,12 +300,12 @@ if __name__ == "__main__":
     train_paths = [
         # os.path.join(train_root, latest_ours, "gt"),
         os.path.join(train_root, latest_ours, "renders"),
-        os.path.join(train_root, latest_ours, "renders_difix_wo_ref"),
+        os.path.join(train_root, latest_ours, "renders_difix_w_ref"),
     ]
-    baseline_labels = ["Renders", "Renders difix_wo_ref"]
+    baseline_labels = ["Renders", "Renders difix_w_ref"]
 
     output_video_path = os.path.join(
-        model_folder, f"{model_name}_horizontal_sine_video_difix_wo_ref.mp4"
+        model_folder, f"{model_name}_horizontal_sine_video_difix_w_ref.mp4"
     )
 
     # ---------- 生成视频 ----------
