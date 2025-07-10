@@ -31,7 +31,7 @@ def batch_process(
             continue
 
         # Prepare output path and skip if already processed
-        output_path = Path(output_folder) / img_path.name
+        output_path = Path(output_folder) / f"{img_path.stem}_difx3d{img_path.suffix}"
         if output_path.exists():
             print(f"Skipping {img_path.name}: output already exists.")
             continue
@@ -49,7 +49,7 @@ def batch_process(
             )
 
             # Save output image
-            output_path = Path(output_folder) / img_path.name
+            output_path = Path(output_folder) / f"{img_path.stem}_difx3d{img_path.suffix}"
             result.images[0].save(str(output_path))
             print(f"Processed and saved: {output_path}")
 
