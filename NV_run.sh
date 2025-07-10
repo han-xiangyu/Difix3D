@@ -15,6 +15,6 @@ cd /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/code/Difix3D
 
 python batched_process_wo_ref.py
 
-python render_video_difix_horizon_sine.py /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/ --fps 15
+# python render_video_difix_horizon_sine.py /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/ --fps 15
 
-rclone copy /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/spatial05_frames3000_with_multi_frame_depth_horizontal_sine_video_difix_wo_ref.mp4  "xiangyuDrive:Research/CityGS/RenderVideos/" -P
+# rclone copy /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/spatial05_frames3000_with_multi_frame_depth_horizontal_sine_video_difix_wo_ref.mp4  "xiangyuDrive:Research/CityGS/RenderVideos/" -P
