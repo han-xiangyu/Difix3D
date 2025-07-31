@@ -13,11 +13,11 @@ export LD_LIBRARY_PATH=/usr/local/cuda-11.8/lib64:/usr/lib/x86_64-linux-gnu
 
 cd /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/code/Difix3D
 
-python batched_process_w_ref.py \
-  --input_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/parallel_left/ours_199993/renders \
-  --ref_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/train/ours_199993/gt \
-  --output_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/parallel_left/ours_199993/renders_difix_w_ref \
-  --prompt "remove degradation"
+# python batched_process_w_ref.py \
+#   --input_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/parallel_left/ours_199993/renders \
+#   --ref_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/train/ours_199993/gt \
+#   --output_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/parallel_left/ours_199993/renders_difix_w_ref \
+#   --prompt "remove degradation"
 
 python batched_process_w_ref.py \
   --input_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/parallel_right/ours_199993/renders \
