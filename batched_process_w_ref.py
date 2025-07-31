@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from diffusers.utils import load_image
 from src.pipeline_difix import DifixPipeline
+import argparse
+
 
 def batch_process(
     input_folder: str,
@@ -79,18 +81,35 @@ def batch_process(
 
 if __name__ == "__main__":
     # Example usage
-    INPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/parallel_right/ours_124993/renders"
-    REF_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/train/ours_124993/gt"
-    OUTPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/parallel_right/ours_124993/renders_difix_w_ref"
-    PROMPT = "remove degradation"
+    # INPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/parallel_right/ours_124993/renders"
+    # REF_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/train/ours_124993/gt"
+    # OUTPUT_DIR = "/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/parallel_right/ours_124993/renders_difix_w_ref"
+    # PROMPT = "remove degradation"
+    
+    # batch_process(
+    #     INPUT_DIR,
+    #     REF_DIR,
+    #     OUTPUT_DIR,
+    #     PROMPT,
+    #     num_inference_steps=1,
+    #     timesteps=[199],
+    #     guidance_scale=0.0,
+    #     device="cuda"
+    # )
+
+    
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_folder", type=str, required=True)
+    parser.add_argument("--ref_folder", type=str, required=True)
+    parser.add_argument("--output_folder", type=str, required=True)
+    parser.add_argument("--prompt", type=str, required=True)
+
+    args = parser.parse_args()
 
     batch_process(
-        INPUT_DIR,
-        REF_DIR,
-        OUTPUT_DIR,
-        PROMPT,
-        num_inference_steps=1,
-        timesteps=[199],
-        guidance_scale=0.0,
-        device="cuda"
+        input_folder=args.input_folder,
+        ref_folder=args.ref_folder,
+        output_folder=args.output_folder,
+        prompt=args.prompt
     )
