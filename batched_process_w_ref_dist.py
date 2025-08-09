@@ -52,11 +52,11 @@ def worker(rank, device, task_list, model_id, prompt, num_inference_steps, times
         )
     pipe.to(device)
 
-    # 多进程多条进度条：用 position 区分
-    pbar = tqdm(total=len(task_list), position=rank, desc=f"GPU {device}", leave=True)
+    pbar = tqdm(total=len(task_list), position=rank, desc=f"GPU {rank}", leave=True)
     for img_path, ref_img_path, out_path in task_list:
         try:
             if out_path.exists():
+                print(f"[GPU {rank}] Skip exists: {out_path.name}")
                 pbar.update(1)
                 continue
 
@@ -73,14 +73,16 @@ def worker(rank, device, task_list, model_id, prompt, num_inference_steps, times
             )
             out_path.parent.mkdir(parents=True, exist_ok=True)
             result.images[0].save(str(out_path))
+            print(f"[GPU {rank}] Saved: {out_path.name}")
+
         except Exception as e:
-            print(f"[GPU {device}] Fail: {img_path.name} -> {e}")
+            print(f"[GPU {rank}] Fail: {img_path.name} -> {e}")
         finally:
             pbar.update(1)
     pbar.close()
 
 def split_evenly(items, n):
-    """把 items 尽量均匀地切成 n 份，前 r 份各多 1 个。"""
+    """尽量均匀切成 n 份，前 r 份各多 1 个"""
     n = max(1, n)
     L = len(items)
     k, r = divmod(L, n)
@@ -120,7 +122,6 @@ def main():
         raise RuntimeError("No CUDA device found.")
     num_gpus = min(args.num_gpus or visible, visible)
 
-    # 均匀切分任务到每张卡（不能整除时，前几卡多 1 张）
     shards = split_evenly(tasks, num_gpus)
 
     ctx = mp.get_context("spawn")
