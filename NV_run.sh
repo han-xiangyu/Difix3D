@@ -29,3 +29,13 @@ python render_video_difix_parallel.py /lustre/fsw/portfolios/nvr/users/ymingli/g
 
 rclone copy "${video_output_path}"  "xiangyuDrive:Research/CityGS/RenderVideos/" -P
 # rclone copy /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/spatial05_frames3000_with_multi_frame_depth_horizontal_sine_video_difix_wo_ref.mp4  "xiangyuDrive:Research/CityGS/RenderVideos/" -P
+
+
+
+# #### Dist
+# python batched_process_w_ref_dist.py \
+#   --input_folder /path/to/renders \
+#   --ref_folder /path/to/gt \
+#   --output_folder /path/to/renders_difix_w_ref \
+#   --prompt "remove degradation" \
+#   --num_gpus 8
