@@ -13,6 +13,8 @@ video_output_path=/lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatia
 
 cd /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/code/Difix3D
 
+
+#### Grendal GS
 # python batched_process_w_ref.py \
 #   --input_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/parallel_left/ours_199993/renders \
 #   --ref_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/train/ours_199993/gt \
@@ -25,12 +27,18 @@ cd /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/code/Difix3D
 #   --output_folder /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/parallel_right/ours_199993/renders_difix_w_ref \
 #   --prompt "remove degradation"
 
-python render_video_difix_parallel.py /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/ --fps 15
+# python render_video_difix_parallel.py /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth_cap3M_L1depthReg05_randomBG_PostOptlr1e4/ --fps 15
 
-rclone copy "${video_output_path}"  "xiangyuDrive:Research/CityGS/RenderVideos/" -P
+# rclone copy "${video_output_path}"  "xiangyuDrive:Research/CityGS/RenderVideos/" -P
 # rclone copy /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/model/spatial05_frames3000_with_multi_frame_depth/spatial05_frames3000_with_multi_frame_depth_horizontal_sine_video_difix_wo_ref.mp4  "xiangyuDrive:Research/CityGS/RenderVideos/" -P
 
 
+##### GSplat
+python batched_process_w_ref_gsplat.py \
+  --input_folder /lustre/fsw/portfolios/nvr/users/ymingli/datasets/citygs/models/spatial05_frames3000_gsplat_mcmc_finalMult1e-2_L1depth2e-3_DensifyStart18000_Stop100k_meansLr2e-3_densifyPortion0.001_cap32M_iter200k_individual_K_fps8w_3000/extrapolated_renders \
+  --ref_folder /lustre/fsw/portfolios/nvr/users/ymingli/datasets/citygs/data/spatial05_frames3000_individual_K_921_fps/images \
+  --output_folder /lustre/fsw/portfolios/nvr/users/ymingli/datasets/citygs/models/spatial05_frames3000_gsplat_mcmc_finalMult1e-2_L1depth2e-3_DensifyStart18000_Stop100k_meansLr2e-3_densifyPortion0.001_cap32M_iter200k_individual_K_fps8w_3000/extrapolated_difixed \
+  --prompt "remove degradation"
 
 # #### Dist
 # python batched_process_w_ref_dist.py \
