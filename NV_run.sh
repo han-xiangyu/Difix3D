@@ -34,7 +34,7 @@ cd /lustre/fsw/portfolios/nvr/users/ymingli/gaussian/code/Difix3D
 
 
 ##### GSplat
-python batched_process_w_ref_gsplat.py \
+python batched_process_w_ref_dist_gsplat.py \
   --input_folder /lustre/fsw/portfolios/nvr/users/ymingli/datasets/citygs/models/spatial05_frames3000_gsplat_mcmc_finalMult1e-2_L1depth2e-3_DensifyStart18000_Stop100k_meansLr2e-3_densifyPortion0.001_cap32M_iter200k_individual_K_fps8w_3000/extrapolated_renders \
   --ref_folder /lustre/fsw/portfolios/nvr/users/ymingli/datasets/citygs/data/spatial05_frames3000_individual_K_921_fps/images \
   --output_folder /lustre/fsw/portfolios/nvr/users/ymingli/datasets/citygs/models/spatial05_frames3000_gsplat_mcmc_finalMult1e-2_L1depth2e-3_DensifyStart18000_Stop100k_meansLr2e-3_densifyPortion0.001_cap32M_iter200k_individual_K_fps8w_3000/extrapolated_difixed \
