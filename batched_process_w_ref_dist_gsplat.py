@@ -7,6 +7,7 @@ from src.pipeline_difix import DifixPipeline
 import torch
 import torch.multiprocessing as mp
 from tqdm import tqdm
+import re
 
 EXTS = {".png", ".jpg", ".jpeg", ".bmp", ".tiff"}
 
