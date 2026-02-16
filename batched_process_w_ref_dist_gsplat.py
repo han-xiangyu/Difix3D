@@ -8,8 +8,9 @@ import torch
 import torch.multiprocessing as mp
 from tqdm import tqdm
 import re
+from PIL import Image
 
-EXTS = {".png", ".jpg", ".jpeg", ".bmp", ".tiff"}
+EXTS = (".png", ".jpg", ".jpeg", ".bmp", ".tiff")
 
 # def build_tasks(input_folder: Path, ref_folder: Path, output_folder: Path):
 #     tasks = []
@@ -32,6 +33,35 @@ EXTS = {".png", ".jpg", ".jpeg", ".bmp", ".tiff"}
 #         tasks.append((img_path, ref_img_path, out_path))
 #     return tasks
 
+def find_stem_image(folder: Path, stem: str):
+    for ext in EXTS:
+        cand = folder / f"{stem}{ext}"
+        if cand.exists():
+            return cand
+    return None
+
+
+def get_image_size(path: Path):
+    with Image.open(path) as img:
+        return img.size
+
+
+def crop_to_target_size(img: Image.Image, target_size):
+    target_w, target_h = target_size
+    src_w, src_h = img.size
+
+    if (src_w, src_h) == (target_w, target_h):
+        return img
+
+    # If source is smaller than the requested crop, fallback to resize.
+    if src_w < target_w or src_h < target_h:
+        return img.resize((target_w, target_h), Image.LANCZOS)
+
+    left = (src_w - target_w) // 2
+    top = (src_h - target_h) // 2
+    return img.crop((left, top, left + target_w, top + target_h))
+
+
 def build_tasks(input_folder: Path, ref_folder: Path, output_folder: Path):
     """
     将 input_folder 中的 *_left / *_right 图，与 ref_folder 中“不带该后缀”的原图配对。
@@ -42,6 +72,7 @@ def build_tasks(input_folder: Path, ref_folder: Path, output_folder: Path):
       <stem>_left_difix3d.<ext> / <stem>_right_difix3d.<ext>
     """
     tasks = []
+    base_size_cache = {}
     for img_path in sorted(input_folder.iterdir()):
         if img_path.suffix.lower() not in EXTS:
             continue
@@ -57,18 +88,27 @@ def build_tasks(input_folder: Path, ref_folder: Path, output_folder: Path):
             continue
 
         # 在 ref_folder 里找“不带后缀”的原图
-        ref_img_path = None
-        for ext in EXTS:
-            cand = ref_folder / f"{base_stem}{ext}"
-            if cand.exists():
-                ref_img_path = cand
-                break
+        ref_img_path = find_stem_image(ref_folder, base_stem)
         if ref_img_path is None:
             print(f"[SKIP] Ref not found for {img_path.name} (expect {base_stem}.* in {ref_folder})")
             continue
 
+        # 在 input_folder 里找原图尺寸，后续用于自动裁剪 left/right 图
+        if base_stem not in base_size_cache:
+            base_img_path = find_stem_image(input_folder, base_stem)
+            if base_img_path is None:
+                print(f"[WARN] Base image not found in input_folder for {img_path.name} (expect {base_stem}.*)")
+                base_size_cache[base_stem] = None
+            else:
+                try:
+                    base_size_cache[base_stem] = get_image_size(base_img_path)
+                except Exception as e:
+                    print(f"[WARN] Failed to read base image size {base_img_path.name}: {e}")
+                    base_size_cache[base_stem] = None
+
+        base_size = base_size_cache[base_stem]
         out_path = output_folder / f"{img_path.stem}_difix3d{img_path.suffix}"
-        tasks.append((img_path, ref_img_path, out_path))
+        tasks.append((img_path, ref_img_path, out_path, base_size))
     return tasks
 
 def worker(rank, device, task_list, model_id, prompt, num_inference_steps, timesteps, guidance_scale, use_bf16=True):
@@ -107,7 +147,7 @@ def worker(rank, device, task_list, model_id, prompt, num_inference_steps, times
         unit="img"
     )
     
-    for img_path, ref_img_path, out_path in task_list:
+    for img_path, ref_img_path, out_path, base_size in task_list:
         try:
             if out_path.exists():
                 print(f"[GPU {rank}] Skip exists: {out_path.name}")
@@ -117,16 +157,37 @@ def worker(rank, device, task_list, model_id, prompt, num_inference_steps, times
             img = load_image(str(img_path))
             ref_img = load_image(str(ref_img_path))
 
+            # 按 input_folder 中原图尺寸自动裁剪；若无原图则保持输入尺寸
+            target_size = base_size if base_size is not None else img.size
+            img = crop_to_target_size(img, target_size)
+
+            # ref 图缩放到同一尺寸，避免拼接 latent 时尺寸不一致
+            if ref_img.size != target_size:
+                ref_img = ref_img.resize(target_size, Image.LANCZOS)
+
+            # 每张图按自身尺寸推理（不是全局固定分辨率）
+            target_w, target_h = target_size
+            infer_w = max(8, (target_w // 8) * 8)
+            infer_h = max(8, (target_h // 8) * 8)
+
             result = pipe(
                 prompt,
                 image=img,
                 ref_image=ref_img,
+                height=infer_h,
+                width=infer_w,
                 num_inference_steps=num_inference_steps,
                 timesteps=timesteps,
                 guidance_scale=guidance_scale,
             )
+
+            out_img = result.images[0]
+            # 回到裁剪目标分辨率，保证每张图输出尺寸与对应原图一致
+            if out_img.size != target_size:
+                out_img = out_img.resize(target_size, Image.LANCZOS)
+
             out_path.parent.mkdir(parents=True, exist_ok=True)
-            result.images[0].save(str(out_path))
+            out_img.save(str(out_path))
             print(f"[GPU {rank}] Saved: {out_path.name}")
 
         except Exception as e:
