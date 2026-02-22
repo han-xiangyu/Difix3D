@@ -33,13 +33,27 @@ EXTS = (".png", ".jpg", ".jpeg", ".bmp", ".tiff")
 #         tasks.append((img_path, ref_img_path, out_path))
 #     return tasks
 
+# def find_stem_image(folder: Path, stem: str):
+#     for ext in EXTS:
+#         cand = folder / f"{stem}{ext}"
+#         if cand.exists():
+#             return cand
+#     return None
 def find_stem_image(folder: Path, stem: str):
+    # 1️⃣ 精确匹配
     for ext in EXTS:
         cand = folder / f"{stem}{ext}"
         if cand.exists():
             return cand
-    return None
 
+    # 2️⃣ progressive difix 匹配
+    for p in folder.iterdir():
+        if p.suffix.lower() not in EXTS:
+            continue
+        if p.stem.startswith(stem):
+            return p
+
+    return None
 
 def get_image_size(path: Path):
     with Image.open(path) as img:
