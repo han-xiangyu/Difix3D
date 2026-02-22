@@ -136,6 +136,7 @@ def worker(rank, device, task_list, model_id, prompt, num_inference_steps, times
         total=len(task_list),
         position=rank,               # 每个GPU一行
         desc=f"GPU {rank}",
+        disable=True,
         leave=True,
         dynamic_ncols=True,          # 适配终端宽度
         mininterval=0.5,             # 刷新最小间隔
@@ -188,7 +189,7 @@ def worker(rank, device, task_list, model_id, prompt, num_inference_steps, times
 
             out_path.parent.mkdir(parents=True, exist_ok=True)
             out_img.save(str(out_path))
-            print(f"[GPU {rank}] Saved: {out_path.name}")
+            #print(f"[GPU {rank}] Saved: {out_path.name}")
 
         except Exception as e:
             print(f"[GPU {rank}] Fail: {img_path.name} -> {e}")
